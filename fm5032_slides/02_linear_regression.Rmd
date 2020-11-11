@@ -1,0 +1,564 @@
+---
+title: "02 - Linear Regression"
+author: "Pritam Dalal"
+output: 
+  revealjs::revealjs_presentation:
+    theme: simple
+    highlight: haddock
+    center: true
+    transition: slide
+    css: reveal.css
+    self_contained: true
+---
+
+
+
+
+
+# Simple Linear Regression
+
+## **The Essential Set-Up**
+
+In simple linear regression we are attempting to predict a quantitative label $Y$ from a single scalar feature $X$.  We assume there is the following linear relationship
+
+\begin{align*}
+Y \approx \beta_0 + \beta_1 X + \epsilon.
+\end{align*}
+
+We begin with training observations $\{(x_1, y_1), \ldots, (x_n, y_n) \}$ and we seek to estimate
+
+\begin{align*}
+\hat{y} = \hat{\beta_0} + \hat{\beta_1}X.
+\end{align*}
+
+
+## **Residual Sum of Squares**
+
+For estimates $\hat{\beta}_0$ and $\hat{\beta}_1$ we define the *residual sum of squares* as follows
+
+\begin{align*}
+
+\text{RSS} = \sum_{i=1}^{n} (y_i - (\hat{\beta}_0 + \hat {\beta}_1) x_i)^2.
+\end{align*}
+
+Our objective will be to choose $\hat{\beta_0}$ and $\hat{\beta_1}$ such that RSS is minimized.  
+
+The geometric intuition is that we are fitting the best line to our training data.
+
+## **Minimizing RSS**
+
+Minimizing RSS yields the following values for the parameters:
+
+\begin{align*}
+\hat{\beta}_1 &= \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n} (x_i - \bar{x})^2} \\[8pt]
+
+\hat{\beta}_0 &= \bar{y} - \hat{\beta}_1\bar{x}
+\end{align*}
+
+where $\bar{x}$ is the average of the $x_i$, and $\bar{y}$ is the average of the $y_i$.
+
+Thus, our estimated regression coefficients are functions of our training data, that is to say they are *statistics*, which leads us naturally to calculating confidence intervals and hypothesis testing.
+
+
+## **Standard Errors of Regression Coefficients**
+
+We can think of our training data $\{(x_i, y_i)\}$ as the result of random sampling, and thus our estimated regression coefficients $\hat{\beta}_0$ and $\hat{\beta}_1$ are statistics.  
+
+As such, we may want to calculate the variance of the sampling distribution of these statistics, so as to form confidence intervals.  These variances are the called *standard errors* and are defined as follows:
+
+\begin{align*}
+\hat{\text{SE}}(\hat{\beta}_0)^2 &= \hat{\sigma}^2 \Bigg[\frac{1}{n} + \frac{\bar{x}^2}{\sum_{i=1}^{n}(x_i - \bar{x})^2}\Bigg] \\[8pt]
+
+\hat{\text{SE}}(\hat{\beta}_1)^2 &= \frac{\hat{\sigma}^2}{\sum_{i=1}^{n}(x_i - x_i)^2}
+
+
+\end{align*}
+
+
+## **Hypothesis Testing: Null Hypothesis**
+
+Recall that the starting point of our linear regression is an assumed linear relationship between the label $Y$ and the feature $X$ that looks like
+
+\begin{align*}
+Y = \beta_0 + \beta_1 X.
+\end{align*}
+
+Notice that if the true $\beta_1$ is equal to zero, then this would mean that there is no relationship between feature and label.
+
+The magnitude of our coefficient estimate $\hat{\beta}_1$ represents the strength that we estimate this relationship to have.
+
+*Hypothesis testing* refers to assuming that the true $\beta_1$ is zero -  an assumption that is called the *null hypothesis* - and then calculating how unlikely our observed $\hat{\beta}_1$ estimate would be if this were the case.
+
+
+
+## **Hypothesis Testing: ** $t$**-statistic**
+
+Even under our null hypothesis assumption that $\beta_1 = 0$, our standard error $\hat{\text{SE}}(\hat{\beta_1})$ remains a valid estimate of the standard deviation of the sampling distribution of $\hat{\beta}_1$.
+
+The following quantity, called the $t$-statistic, represents the number of standard deviations away from the mean our coefficient estimate is, assuming that the null hypothesis is true:
+
+\begin{align*}
+t = \frac{\hat{\beta}_1 - 0}{\hat{\text{SE}}(\hat{\beta_1})}.
+\end{align*}
+
+
+If the null hypothesis is true, then $t$ has the $t$-distribution with $n-2$ degrees of freedom, which is very close to normal for $n > 30$.
+
+A large $t$-statistic means that the size of the coefficient estimate is much larger than it's standard-deviation, so we can be confident that $\beta_1 \neq 0$.  
+
+The statistics jargon for this is *rejecting the null hypothesis*.
+
+
+## **Hypothesis Testing: ** $p$**-value**
+
+Recall that under the null hypothesis, that the $t$-statistic is approximately normally distributed for a reasonably large training set ($n > 30$).
+
+The $p$-value of the $t$-statistic is the probability of seeing a $t$-statistic of larger magnitude, which can be calculated by looking at the normal distribution.
+
+A small $p$-value means that a larger $t$-statistic would be very unlikely, which gives us confidence that $\beta_0 \neq 0$.  
+
+As a matter of convention, many people assign $p = 0.05$ special meaning.  But this is arbitrary.
+
+
+## **Residual Standard Error**
+
+Recall that the relationship we are positing between label $Y$ and feature $X$ is as follows
+
+\begin{align*}
+Y = \beta_0 + \beta_1 X + \epsilon.
+\end{align*}
+
+The *residual standard error* is an estimate of the standard deviation of $\epsilon$ and is given by
+
+
+\begin{align*}
+\text{RSE} = \sqrt{\frac{1}{n-2} \text{RSS}} = \sqrt{\frac{1}{n-2} \sum_{i=1}^{n}(y_i - \hat{y}_i)^2}.
+\end{align*}
+
+
+RSE is a goodness of fit measure, but it is hard to interpret because it is expressed in units of $Y$.  
+
+The $R^2$, which we discuss next gives a unit-free measure of fit.
+
+
+## $R^2$
+
+The easiest way to express $R^2$ is as an expression of *residual sum of squares* (RSS) and *total sum of squares* (TSS)
+
+\begin{align*}
+R^2 &= \frac{\text{TSS} - \text{RSS}}{TSS}
+\end{align*}
+
+where we have that
+
+\begin{align*}
+TSS &= \sum_{i = 1}^{n} (y_i - \bar{y})^2 \\[8pt]
+RSS &= \sum_{i = 1}^{n} (y_i - \hat{y})^2.
+\end{align*}
+
+The value of $R^2$ is always in $[0, 1]$ and it can be interpreted as the percentage of the label's variance that is explained by the feature.
+
+##  $R^2$ **and Correlation**
+
+The following identity that relates $R^2$ and correlation is useful
+
+\begin{align*}
+R^2 = \hat{\text{Corr}}(X, Y) ^ 2
+\end{align*}
+
+where we have that
+
+\begin{align*}
+\hat{\text{Corr}}(X, Y) &= \frac{\sum_{i = 1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i = 1}^{n}(x_i - \bar{x})^2}\sqrt{\sum_{i = 1}^{n}(y_i - \bar{y})^2}}.
+\end{align*}
+
+
+
+
+
+
+
+# Multiple Linear Regression
+
+
+## **The Basic Setup**
+
+Consider a quantitative label $Y$ that is predicted by a number of quantitative features 
+
+\begin{align*}
+X = (X_1, \ldots, X_p).  
+\end{align*}
+
+
+Our starting assumption is that the following linear relationship is approximately true
+
+\begin{align*}
+Y = \beta_0 + \beta_1 X_1 + \ldots + \beta_p X_p + \epsilon.
+\end{align*}
+
+We are effectively assuming that $E(Y | X)$ is linear, or that linear is a good approximation.
+
+We interpret $\beta_j$ as the average effect of $X_j$ on $Y$, while holding all of the other features constant.
+
+
+
+## **Derivation (ESL)**
+
+We proceed to fit this model to training data $\{(x_1, y_1), 
+\ldots, (x_n, y_n)\}$ by minimizing the residual sum of squares defined as 
+
+\begin{align*}
+\text{RSS}(\beta) &= \sum_{i=1}^{n}(y_i - \hat{f}(x)) \\[8pt]
+&= \sum_{i=1}^{n} \bigg(y_i - \beta_0 - \sum_{j=1}^{p} x_{ij} \beta_j\bigg).
+\end{align*}
+
+In order to solve this minimization we will introduce some matrix notation.
+
+
+## **Derivation (ESL)**
+
+Let $\mathbf{X}$ be the $n \times (p+1)$ matrix where each row is a feature observation, and the first column is all ones (representing the intercept).
+
+Let $\mathbf{y}$ be the $n$-vector of training labels.  Then we can rewrite RSS as follows:
+
+\begin{align*}
+\text{RSS}(\beta) &= (\mathbf{y} - \mathbf{X}\beta)^T(\mathbf{y} - \mathbf{X} \beta).
+\end{align*}
+
+(Note: this matrix notation is a short-hand for a bunch of arithmetic, but there is probably some interesting Euclidean geometry going on here.)
+
+RSS is a quadratic form in $\beta$ which consists of $p + 1$ parameters. So we have that
+
+\begin{align*}
+\frac{\partial \text{RSS}}{\partial \beta} &= -2\mathbf{X}^T(\mathbf{y} - \mathbf{X} \beta)\\[8pt]
+
+\frac{\partial^2 \text{RSS}}{\partial \beta \partial \beta^T} &= 2\mathbf{X}^T{X}.
+\end{align*}
+
+
+## **Derivation (ESL)**
+
+Assuming that $\mathbf{X}$ has full column rank (so no collinearity) then $\mathbf{X}^T\mathbf{X}$ is positive definite.  This means that the unique solution is 
+
+\begin{align*}
+\hat{\beta} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}
+\end{align*}
+
+Note that the fitted label values to the training data are:
+
+\begin{align*}
+\hat{\mathbf{y}} = \mathbf{X}\hat{\beta} = \mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}.
+\end{align*}
+
+The matrix $\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T$ is referred to as the hat matrix, because it *puts the hat* on $\mathbf{y}$.
+
+
+## **Linear Algebra Interpretation (ESL)**
+
+There is a succinct linear algebra interpretation for multiple regression.
+
+The vector of fitted labels $\hat{\mathbf{y}}$ is the orthogonal projection of $\mathbf{y}$ onto the linear subspace spanned by $\mathbf{x}_0, \ldots, \mathbf{x}_p$, which are the columns of $\mathbf{X}$.  Notice that this is a $p$-dimensional subspace of $\mathbb{R}^n$.
+
+Said in another way, we choose $\hat{\mathbf{y}}$ such that $\mathbf{y} - \hat{\mathbf{y}}$ is orthogonal to the column space of $\mathbf{X}$.
+
+This is true even if we have collinearity, although the dimension of the column space will be smaller in that case.
+
+
+
+
+## **Questions to Consider (ISL)**
+
+There are a number of important questions to ask in a multiple regression setting:
+
+1. Is at least one of the labels $X_1, \ldots, X_p$ useful in predicting the label $Y$?
+
+2. Do all the feature help to predict $Y$, or only a subset?
+
+3. How well does the model fit the data?
+
+4. Given a particular feature observation, what is the associated label prediction, and how accurate is it?
+
+
+## **Hypothesis Testing (ISL)**
+
+In hypothesis testing, we are trying to choose between two mutually exclusive conclusions about the labels and features.  
+
+The first is called the *null hypothesis*, and it states that all the coefficients $\beta_j$ are equal to zero.
+
+The second is called the *alternative hypothesis*, which asserts that at least one of the $\beta_j$ is non-zero. 
+
+These hypotheses are denoted $H_0$ and $H_a$ and can be expressed as follows:
+
+\begin{align*}
+H_0&: \beta_1 = \ldots = \beta_p = 0 \\[8pt]
+H_a&: \sum_{i=1}^{p} |\beta_i| > 0.
+\end{align*}
+
+## **Hypothesis Testing (ISL)**
+
+The choice between the null and alternative is tested by using the $F$-statistic, which is defined as
+
+\begin{align*}
+F = \frac{(TSS - RSS) / p}{RSS/(n - p - 1)}
+\end{align*}
+
+where $\text{TSS} = \sum_{i = 1}^{n}(y_i - \bar{y})^2$ and  $\text{RSS} = \sum_{i = 1}^{n}(y_i - \hat{y}_i)^2$.
+
+If the linear model assumptions are true we have that
+
+\begin{align*}
+E(RSS / (n-p-1)) = \sigma^2,
+\end{align*}
+
+and if the null hypothesis is true we have that 
+
+\begin{align*}
+E((TSS - RSS)/p) = \sigma^2.
+\end{align*}
+
+## **Hypothesis Testing (ISL)**
+
+The punchline of all this is as follow:
+
+If $H_0$ is true we should have that $F \approx 1$.
+
+If $H_a$ is true, then $E((TSS - RSS)/p) > \sigma^2$ and we will have that $F > 1$.  
+
+So $F \gg 1$ indicates some predictive power of the entire model, and hence at least some of the features.  And as such, we would be comfortable rejecting the null hypothesis.
+
+## **Hypothesis Testing (ISL)**
+
+Suppose we want to test null hypothesis for a subset of the features:
+
+\begin{align*}
+H_0: \beta_{p-q+1} = \beta_{p-q+2} = \ldots = \beta_{p} = 0.
+\end{align*}
+
+In order to do this we rerun a regression excluding $X_{p-q+1}, \ldots, X_p$.  We calculate a residual sum of squares for this new model and call it $\text{RSS}_0$.  The $F$-statistic for this particular null hypothesis is:
+
+\begin{align*}
+F &= \frac{(RSS_0 - RSS)/q}{RSS / (n - p - 1)}.
+\end{align*}
+
+Note that it is possible to design a $t$-statistic for each coefficient estimate in a multiple regression.  This statistic is equivalent to $F$-statistic associated with removing that particular variable, and leaving the rest in (need to verify this).
+
+## **Sampling Properties of Multiple Regression (ESL)**
+
+Thus far we have not made any assumptions about the true distribution of the data.
+
+In order to calculate sampling properties of $\hat{\beta}$ we will assume that the $y_i$ are uncorrelated and have constant variance $\sigma^2$.  We will also assume that the $x_i$ are non-random.  
+
+Then the covariance matrix of the parameters $\hat{\beta}$ is denoted $\text{Var}(\hat{\beta})$ and is given by
+
+
+\begin{align*}
+\text{Var}(\hat{\beta}) = (X^T X)^{-1} \sigma^2.
+\end{align*}
+
+We can estimate $\sigma^2$ from the data as follows
+
+\begin{align*}
+\hat{\sigma}^2 = \frac{1}{n - p - 1} \sum_{i = 1}^{n} (y_i - \hat{y}_i)^2. 
+\end{align*}
+
+## **Statistical Inference (ESL)**
+
+In order to make statistical inferences about the parameters let's assume that
+
+\begin{align*}
+Y = \beta_0 + \sum_{j = 1}^p X_j \beta_j + \epsilon
+\end{align*}
+
+where we have that $\epsilon \sim N(0, \sigma^2)$, i.e. normally distributed with mean zero and variance $\sigma^2$.  
+
+Then we have that $\hat{\beta}$ is multivariate normal; in particular,
+
+
+\begin{align*}
+\hat{\beta} \sim N(\beta, (X^TX)^{-1}\sigma^2).
+\end{align*}
+
+## **Statistical Inference (ESL)**
+
+We also have that 
+
+\begin{align*}
+(n - p - 1)\hat{\sigma}^2 \sim \sigma^2 \chi^2_{n-p-1}
+\end{align*}
+  
+where $\chi^2_{n-p-1}$ is the chi-squared distribution with $n-p-1$ degrees of freedom.
+
+Moreover, $\hat{\beta}$ and $\hat{\sigma}$ are independent.  
+
+We can use these facts to produce confidence intervals, which leads to hypothesis testing.
+
+## **Hypothesis Testing (ESL)**
+
+Let $z_j$ be the $z$-score of $\beta_j$, meaning that
+
+\begin{align*}
+z_j &= \frac{\hat{\beta}_j - 0}{\hat{\sigma} \sqrt{v_j}}
+\end{align*}
+
+where $v_j$ is the $j$th diagonal element of $\big(\mathbf{X}^T \mathbf{X}\big)^{-1}$ under the null hypothesis that $\beta_j = 0$.
+
+Then $z_j$ is $t$-distributed with $n - p - 1$ degrees of freedom.  If $\hat{\sigma}$ is replaced by $\sigma$ then the distribution is normal.  
+
+In practice we use the normal distribution for $z_j$.
+
+## **Hypothesis Testing (ESL)**
+
+To test for the significance of a group of features, we use the $F$ statistic
+
+<br> 
+
+\begin{align*}
+F &= \frac{(RSS_0 - RSS_1) / (p_1 - p_0)}{RSS_1 / (n - p -1)}
+\end{align*}
+
+where $\text{RSS}_1$ is from the bigger model with $p + 1$ parameters, and $\text{RSS}_0$ is from the smaller model with $p_0 + 1$ parameters.
+
+Under the null hypothesis that all the coefficients of the smaller model are zero, the $F$-statistic has and $F_{p - p_0, \, n - p -1}$ distribution.
+
+The $z_j$ scores defined above are equivalent to the $F$-statistic from removing the single feature $X_j$ from the model.
+
+For large $n$ we have that $F_{p - p_0, \, n - p - 1} \sim \chi^2_{p - p_0}$.
+
+## **Confidence Intervals (ESL)**
+
+The $1 - 2\alpha$ confidence interval for $\hat{\beta}$ is as follow
+
+\begin{align*}
+\bigg(\hat{\beta} - z^{(1 - \alpha)} v_j^{1/2}\hat{\sigma}, \,\,  \hat{\beta} + z^{(1 - \alpha)} v_j^{1/2}\hat{\sigma}\bigg)
+\end{align*}
+
+where $z^{(1-\alpha)}$ is the $(1-\alpha)$-percentile of the normal distribution.
+
+(We can also produce confidence intervals of all the parameters simultaneously.)
+
+## **Determining Variable Importance (ISL)**
+
+It may be the case that only a subset of the features is predictive.  It is often helpful to be able to identify only those that are, and remove those that are not.
+
+The general strategy for this is to fit regressions using various subsets of the data, and then to compare these various models with the following tests:
+
+- Mallows $C_p$
+- Akaike Information Criteria (AIC)
+- Bayesian Information Criteria (BIC)
+- Adjusted $R^2$.
+
+
+## **Variable Selection Schemes (ISL) **
+
+*Forward Selection:* start with a single feature model that has the lowest RSS.  Then add a second variable that leads to the lowest RSS two-feature model. Etc.
+
+*Backward Selection:* start will all $p$ features.  Remove the one with the highest $p$-value, and the run a model with $p-1$ features. Again remove the one with the highest $p$-values. Etc.
+
+*Mixed:* start with no features.  Start adding features with forward selection until one of the features has a high $p$-value.  Remove that one, and then keep adding with forward selection until there is another high $p$-value. Continue until you have tried every variable.
+
+Note that forward selection is a greedy algorithm.  This means that variables can be selected early that later become redundant.  Mixed selection can remedy this.
+
+
+## **Determining Model Fit (ISL)**
+
+In multiple-regression, $R^2$ always increases as you add additional features.  This is because additional features always allow for better fitting of the training data.  But the improved performance won't necessarily translate to data in the wild.
+
+Plotting residuals against fitted values can be a useful technique for assessing model fit.  Clear patterns in the residuals indicate that the linear or homoskedastic assumptions may be inappropriate.
+
+## **Dealing with Heteroskedasticity (ISL)**
+
+One of the assumptions of linear regression is that the error term $\epsilon$ has a variance that is constant and independent of the features $X$. If this is not the case, the data is said to be *heteroskedastic*.
+
+Heteroskedasticity may be identified by the presence of a funnel shape in the residuals plot.  Applying a concave transformation such as $\log(\cdot)$ or $\sqrt{(\cdot)}$ may help to resolve this.
+
+Weighted least squares is another approach to addressing heteroskedasticity.
+
+## **Outliers (ISL)**
+
+Unusual values $y_i$ of the label are called *outliers*.  Unusual values $x_i$ of the features are called *high leverage points*.
+
+Both of these artifacts in the data can have an substantial impact on a regression.
+
+## **Collinearity (ISL)**
+
+When two or more features are nearly perfectly correlated with one another, this is called *collinearity*.  
+
+Collinearity creates instability in the coefficients, and does not add to predictive power.
+
+The *variance inflation factor* can be used to measure collinearity
+
+\begin{align*}
+\text{VIF}(\hat{\beta}_j) &= \frac{1}{1 - R^2_{X_j|X_{-j}}}
+\end{align*}
+
+where $R^2_{X_j|X_{-j}}$ is the $R^2$ of $X_j$ regressed against all the other features.
+
+## **Collinearity (ISL)**
+
+There is a useful interpretation of the variance inflation factor.  
+
+It can be shown that $\text{VIF}(\hat{\beta}_j)$ is the variance of $\hat{\beta}_j$ when fit in the full model, divided by the variance of $\hat{\beta}_j$ if it is fit on it's own.
+
+If collinearity is detected, then drop one of the problem variables, or combine them together.
+
+## **Non-Linearity and Interaction Terms (ISL)**
+
+Consider a two feature linear model:
+
+\begin{align*}
+Y &= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \epsilon.
+\end{align*}
+
+One way to extend this model to capture certain kinds of non-linearity is to include the interaction term $X_1 X_2$.  The extended model looks like this
+
+\begin{align*}
+Y &= \beta_0 + \beta_1 X_1 + \beta_2 X_2 + + \beta_3 X_1 X_2 + \epsilon.
+\end{align*}
+
+The *hierarchical principle* states that if we include an interaction term in a regression, the should also include the main effects, even if they have large $p$-values.
+
+
+## **Gauss-Markov Theorem (ESL)**
+
+Least squares estimates are the the best linear unbiased estimators of the regression parameter in $Y = \beta X + \epsilon$.
+
+It is *best* in the sense that it has the lowest variance.  In order for this to be true, we require that the errors be uncorrelated, finite variance, and homoskedastic.  We do not require normality of errors, or that they are i.i.d.
+
+There may however be biased estimators that have much lower bias.  Regularization techniques (e.g. lasso, ridge) trade a bit of bias for a large reduction in variance.
+
+
+
+# Misc Notes
+
+## **Nearest Neighbors Regression**
+
+KNN regression looks like this
+
+\begin{align*}
+\hat{f}(x_0) = \frac{1}{K} \sum_{x_i \in N_k(x)} y_i
+\end{align*}
+
+where $N_k(x)$ is the set of $k$ training feature observations that are closest to $x$.
+
+## **Dummy Variables**
+
+I need to understand dummy variables and one-hot encoding better.
+
+Let $G$ be a five-level categorical input.  We can create $X_j$, for $j=1, \ldots 5$ such that $X_j = I(G = j)$.
+
+Collectively, this group of $X_j$ represents the effect of $G$ since in 
+
+\begin{align*}
+\sum_{j = 1} X_j\beta_j 
+\end{align*}
+
+only one of the $X_j$ is one, and the rest are zeros.
+
+
+# References
+
+##
+
+*Introduction to Statistical Learning* - Chapter 3
+
+*Elements of Statistical Learning* - Sections 3.1-3.2

@@ -1,0 +1,241 @@
+---
+title: "Tree Based Methods"
+output: 
+  revealjs::revealjs_presentation:
+    theme: simple
+    highlight: haddock
+    center: true
+    transition: slide
+    css: reveal.css
+    self_contained: true
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+# Notation
+
+## **Features and Labels**
+
+Consider a learning problem where the training data consists of $n$ different observations of $p$ features.  
+
+Let $(x_{i1} \ldots x_{ip})$ denote the $i$th observation of the training data, where $i = 1,\ldots,n$.
+
+Then $y_i$ will denote the label observation associated with $(x_{i1} \ldots x_{ip})$.
+
+
+## **Prediction Function**
+
+Based on our training data, we would like to construct a prediction function $f$ such that for a feature observation that's not in our training data (out-of-sample), call it $(x^{*}_1 \ldots x^{*}_p)$, it produces a label prediction $y^{*}$.
+
+Once the actual label is realized, we can compare it to our prediction.  If we repeat this for many out-of-sample feature observations, we can get a sense of the overall performance of our prediction function.
+
+
+# Decision Tree Regression
+
+## **Regression via Partition**
+
+Consider a regression problem in which we are making predictions based on $p$ quantitative features.  
+
+This means that the space of all possible feature observations is $\mathbb{R}^p$.
+
+Let $R_{1}, \ldots, R_{M}$ be a partition of $\mathbb{R}^p$.
+
+Let $\hat{y}_{R_j}$ be the average of all training labels whose associated training feature instances lie in $R_j$, where $j = 1, \ldots, M$.
+
+A regression based on this partition is one in which the resulting prediction function $f$ is such that for an out-of-sample feature observation $(x^{*}_1, \ldots, x^{*}_p) \in R_{k}$ we have that:
+
+\begin{align*}
+f(x^{*}_1, \ldots ,x^{*}_p) = \hat{y}_{R_k}
+\end{align*}
+ <!-- if that feature observation lies in $R_{j}$. -->
+
+<!-- author: Pritam Dalal -->
+<!-- date: "Active Analytics LLC <br> University of Minnesota, Twin Cities <br> <br> November 7th, 2019" -->
+
+
+## **How to Partition the Feature Space?**
+
+For a fixed partition size $M$, we would like to find a partition $R_{1},\ldots, R_{M}$ such that the residual sum of squares (RSS) is minimized.  Recall that
+
+\begin{align*}
+\text{RSS} = \sum_{j = 1}^{M} \sum_{y_{i} \in R_j} \big(y_{i} - \hat{y}_{R_j}\big)^2
+\end{align*}
+
+The exact solution to this problem is computationally infeasible.
+
+A *decision tree* is one approach to construct a meaningful partition of $\mathbb{R}^p$  in a manner that is computationally feasible.
+
+
+## **Decision Tree Partitioning Algorithm (1 of 2)**
+
+Let $j$ be in the range $1, \ldots, p$ and suppose $s$ is a number.
+
+Define $R_{1}(j, s)$ and $R_{2}(j, s)$ as follows:
+
+\begin{align*}
+R_{1}(j, s) &= \{X \in \mathbb{R}^p | X_{j} < s\} \\
+R_{2}(j, s) &= \{X \in \mathbb{R}^p | X_{j} \geq s\}
+\end{align*}
+
+We seek to find $j$ and $s$ such that the total RSS is minimized:
+
+\begin{align*}
+\sum_{y_i \in R_1(j, s)} \big(y_{i} - \hat{y}_{R_1(j, s)}\big)^2 + \sum_{y_i \in R_2(j, s)} \big(y_{i} - \hat{y}_{R_2(j, s)}\big)^2
+\end{align*}
+
+This can be done fairly quickly if $p$ is not too large. 
+
+## **Decision Tree Partitioning Algorithm (2 of 2)**
+
+The previous step results in a two region partition of the feature space $\mathbb{R}^p$.  Let's call these two regions $R^{1}_{1}$ and $R^{1}_{2}$.
+
+Next, we split one of the $R^{1}_i$ such that the total RSS is minimized.  This results in a three region partition the feature space, call them $R^{2}_{1}, R^{2}_{2}, R^{2}_{3}$. (Note that one of the $R^2_{i}$ is identical to the one of the regions in the previous step.)   
+
+A decision tree partition is constructed by repeating this process until some stopping criterion is met, e.g. maximum number of iterations, minimum number of nodes in region, maximum number of leaves, etc.
+
+# Decision Tree Classification
+
+## **Classification via a Partition**
+Consider a classification problem in which we are making predictions based on $p$ quantitative features.  
+
+This means that the space of all possible feature observations is $\mathbb{R}^p$.
+
+Let $R_{1}, \ldots, R_{M}$ be a partition of $\mathbb{R}^p$
+
+Let $\hat{g}_{R_j}$ be the most common of all training labels whose associated training feature instances lie in $R_j$, where $j = 1, \ldots, M$.
+
+A classification based on this partition is one in which the resulting prediction function $f$ is such that for an out-of-sample feature observation $(x^{*}_1, \ldots, x^{*}_p) \in R_{k}$ we have that:
+
+\begin{align*}
+f(x^{*}_1, \ldots ,x^{*}_p) = \hat{g}_{R_k}
+\end{align*}
+
+
+## **Misclassification Rate**
+
+The algorithm for constructing a classification decision tree proceeds quite similarly to the regression, but we can no longer use RSS minimization as our criterion at each iteration.
+
+Suppose we have a partition of the feature space $R_1, \ldots, R_M$.  Then the total misclassification rate for this partition would be:
+
+\begin{align*}
+\sum_{m = 1}^{M} \frac{|R_m|}{n}\big(1 - \max_{k}(\hat{p}_{mk})\big)
+\end{align*}
+
+where $\hat{p}_{mk}$ is the proportion of labels in $R_m$ from the $k$th class. 
+
+In practice, misclassification is not sensitive enough to be useful for classification partition construction.
+
+## **Gini Index and Cross-Entropy**
+Two measures of partition impurity are typically used when constructing classification trees:
+
+\begin{align*}
+\text{Gini Index} &= \sum_{k=1}^{K}\hat{p}_{mk}(1 -\hat{p}_{mk}) \\
+
+\text{Cross-Entropy} &= -\sum_{k=1}^{K}\hat{p}_{mk}\,\log\hat{p}_{mk}
+\end{align*}
+
+Notice that both of these measures are small when all the $\hat{p}_{mk}$ are close to 0 or 1, which would mean that all the partition elements contains predominatly one class label.
+
+Both these measures lead to similar trees.  Gini-Index is a good default to start with, and is the default in `sklearn`.
+
+# Ensemble Tree-Based Models
+
+## **Improving Performance**
+
+Decision trees are easy to understand, but they tend to have poor performance.  There are several refinements - all *ensemble* approaches - that can improve performance.
+
+**Bagging** - this is short for bootstrap aggregation.  The idea is to fit many small trees using subsamples of the training data, and then average the results of the subtrees the trees.
+
+**Random Forests** - fit many small trees using random subsets of the features and the the training data.  Then average over the the results.
+
+
+**Gradient Boosting** - fit one tree, and then one to its residuals, and then one to the aggregate residuals, etc.  The final model is the aggregate of the progression of fitted trees.
+
+## **Bagging**
+
+Bagging is where we calculate $B$ different bootstrapped prediction functions - call them $\hat{f}^1,\ldots,\hat{f}^B$ - and then take their average:
+
+\begin{align*}
+\hat{f}_{\text{bag}}(x) = \frac{1}{B} \sum_{b=1}^{B} \hat{f}^{b}(x).
+\end{align*}
+
+For classifiction, the averaging can occur by plurality vote, or by taking an average of the probabilities.  The latter gives greater weight to confident predictions.
+
+## **Out-of-Bag Observations**
+
+For a bagged prediction, each training observation will not be used by some of the bootstrapped predictions.
+
+When an observation is not used for training, you can calculated an out-of-bag prediction, and it's associated error.  So you get out-of-sample cross-validation calculations as part of the fitting process.  
+
+These can be stored and analyzed in `sklearn`.
+
+
+## **Random Forests**
+
+Similar to bagging, with *random forests* we grow trees based on bootstrapped training data.  
+
+Additionally, at each step, only a randomly selected subset of the features is considered for splitting.  Typically, we use $m \approx \sqrt{p}$.
+
+The idea is that if there is one very predictive feature, then all the bootstrapped trees will look very similar, and thus their predictions will be highly correlated, making the averaging less effective.
+
+
+
+
+# Miscellaneous Notes
+
+## **Feature Importance**
+
+In the process of fitting trees today, we can record amount of goodness of fit improvement associated with cuts along all the features.  In regression this is RSS reduction, while in classification this is Gini reduction.
+
+The more fit improvement attributable to a feature, the more important that feature is in predicting the label.
+
+In `sklearn`, when you fit a tree-based model, you can analyze the feature importances.
+
+## **Trees vs Linear Models**
+
+Here is a brief comparison of the functional form of a linear model and a tree model.
+
+Linear Model: 
+
+\begin{align*}
+f(x) = \beta_0 + \sum_{j = 1}^{P} X_j \beta_j
+\end{align*}
+
+
+Tree Model:
+
+\begin{align*}
+f(x) = \sum_{m = 1}^{M} C_m I_{x \in R_m}
+\end{align*}
+
+where $R_1,\ldots,R_M$ is a greed binary recursive partition of the feature space.
+
+## **Pros and Cons of Trees**
+
+Pros:
+
+    - easy to explain
+    - closely mirrors human decision making
+    - intuitive graphical displays
+    - can handle qualititative predictors
+  
+Cons:
+
+    - not predictive due to overfitting
+    - non-robust (high variance)
+    
+## **Material to Add**
+
+    - regularization 307-308
+    - cost-complexity pruning
+    - adaboost algo pg 323
+    
+    
+# References
+
+##
+*Introduction to Statistical Learning* - Chapter 8

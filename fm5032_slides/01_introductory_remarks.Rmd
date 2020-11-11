@@ -1,0 +1,586 @@
+---
+title: "01 - Introductory Remarks"
+author: "Pritam Dalal"
+output: 
+  revealjs::revealjs_presentation:
+    theme: simple
+    highlight: haddock
+    center: true
+    transition: slide
+    css: reveal.css
+    self_contained: true
+---
+
+
+# Machine Learning & Statistics
+
+
+##  **Data Analysis**
+
+This course is about performing analysis on financial data.
+
+Financial data is generated in all manner of ways:
+    
+    - trading activities
+    - company regulatory filings
+    - debt servicing activities
+
+The task of collecting, processing, and storing that data in a usable format is a massive undertaking that must be completed before analysis can begin.
+
+Unfortunately, we will not have time to dig into this important subject matter.  We will largely be performing analysis on clean data sets.
+
+## **Prediction and Inference**
+
+There are two main objectives when performing analysis on data.
+
+**Prediction:** making predictions or forecasts about unknown things in the world - often future events.
+
+**Inference:** learning more about the process that generated the data.
+
+In this course, our focus will be on prediction.  However, sometimes an inferential perspective is useful for improving predictions.
+
+
+## **Machine Learning vs Statistics**
+I'll leave it to the philosophers and academics to draw strong demarcations between *machine learning* and *statistics*.
+
+From my perspective, they are both fields of study that deal with extracting insights from data.  There is significant overlap in the concepts, terminology, and the underlying mathematics - probability, linear algebra, real analysis.
+
+In machine learning, there is greater focus on prediction. In Statistics there is more emphasis on inference.
+
+Since in this course we are focused on prediction, we will tend to be more sympathetic to the machine learning point of view, and will therefore tend to prefer machine learning terminology and notation.
+
+
+## **Prediction Nomenclature**
+
+In a generic prediction problem, we seek to *predict* unobservable *outputs* from a set of observable *inputs*.  
+
+This type of a procedure is described in various related fields, using a variety of terminology.
+
+|general|statistics|classical|pattern recognition|
+|---|---|---|---|
+|inputs|predictor|independent variable|feature|
+|predict|model|fit|learn|
+|outputs|response|dependent variable|label|
+
+We will tend to use the pattern recognition nomenclature: *learning labels from features*.  
+
+However, the literature tends to use all of these terms interchangably, so it's good to get comfortable with all of them. 
+
+
+## **Regression and Classification**
+
+When we seed to predict a quantitative label, it is called a *regression* problem.
+
+When we predict a qualitative label, it is called a *classification* problem.
+
+Certain prediction methods are better suited for regression or classification. Other methods work equally well for both.
+
+# Notation
+
+
+## **Training Data Sets**
+
+We will use the language of mathematics to discuss prediction, so we will need some notation to describe data sets.
+
+The starting point for our analysis will be a sample of data, which we will call the *training data*.  We will use the training data to derive our perdiction mechanisms.
+
+The training sample consists of *observations* of various *features*, as well as the *label* associated with each feature observation.
+
+The number of observations in our sample will be denoted $n$.
+
+## **Feature Observations**
+
+The number of features in each observation will be $p$.
+
+We will let $\mathbf{X}$ denote the $n \times p$ matrix whose $(i, j)$th coordinate is the $i$th observation of the $j$th feature.  So we have that:
+
+\begin{align*}
+\mathbf{X} &=
+  \begin{pmatrix}
+  x_{11} & x_{12} & \ldots & x_{1p}\\
+  x_{21} & x_{22} & \ldots & x_{2p}\\
+  \vdots & \vdots & \ddots & \vdots\\
+  x_{n1} & x_{n2} & \ldots & x_{np}\\
+  \end{pmatrix}
+\end{align*}
+
+We will let $x_i$ to refer to the the $i$th row of $\mathbf{X}$, i.e. the $p$-vector that is the $i$th feature observation.
+
+
+The $n$-vector of all observations of the $j$th feature, will be denoted $\mathbf{x}_j$.
+
+As a matter of convention, all vectors, when expressed as matrices, will be column matrices.  This means that:
+
+\begin{align*}
+\mathbf{X} = (\mathbf{x}_1, \ldots, \mathbf{x}_p). 
+\end{align*}
+
+
+
+
+
+## **Label Observations**
+
+The $n$-vector of label observations in our training sample will be denoted:
+
+\begin{align*}
+\mathbf{y} = 
+  \begin{pmatrix}
+  y_{1} \\
+  y_{2} \\
+  \vdots \\
+  y_{n} \\
+  \end{pmatrix}
+\end{align*}
+
+
+## **Random Variables**
+
+As mentioned above, the starting point for data analysis is a sample data set.  It will be useful to think of this data as being the realization of random variables.
+
+The feature random variable will be denoted $X = (X_1, \ldots, X_p$).
+
+If the label random variable is numeric, it will be denoted $Y$.  
+
+We will use $G$ to denote a random variable that represents a categorical label.
+
+
+## **Guidelines for Our Notation**
+Here are the summarizing guidlines for our notation:
+
+Vectors of length $n$ (# observations) are lowercase bold: $\mathbf{x}_j$, $\mathbf{y}$.
+
+Scalars, or vectors of length $p$ (# features) are lowercase normal font: $x_i$, $x_{ij}$.
+
+Matrices are bold capitals: $\mathbf{X}$
+
+Random variables are normal font capitals: $X$, $Y$, $G$.
+
+
+
+# Statistical Learning
+
+## **The Basic Framework**
+Let $Y$ be a quantitative label and let $X = (X_1, \ldots X_p)$ be features which we believe are predictive of $Y$. We assume there is some functional relationship between $X$ and $Y$, where
+
+\begin{align*}
+Y = f(X) + \epsilon
+\end{align*}
+
+and we have that $\epsilon$ is random error that is independent of $X$ and has mean zero.
+
+So, $f$ represents the systematic information that $X$ provides about $Y$.  
+
+*Statistical learning* refers to various of approaches for or estimating $f$.
+
+The estimated function is denoted as $\hat{f}$ in order to distinguish it from the (unknown) actual relationship function $f$.
+
+
+
+## **Estimating** $\hat{f}$ **by a Learning Algorithm**
+
+Suppose we have a set of observed training data consisting of both inputs and outputs:
+
+\begin{align*}
+\{(x_1, y_1), \ldots, (x_n, y_n)\}.
+\end{align*}
+
+
+
+Our goal is to apply statistical learning methods to our training data to estimate:
+
+\begin{align*}
+\hat{f}(X) = Y.
+\end{align*}
+
+  
+To do this, the the observed inputs are fed into a learning algorithm, an artificial system that usually takes the form of a computer program.  The learning algorithm produces output $\hat{f}(x_i)$ associated with the observed input $x_i$.
+
+
+The learning algorithm can modify $\hat{f}$ in response to the differences $y_{i} - \hat{f}(x_i)$.  Once the learning process is complete, the hope is that the artificial and real outputs are close enough so that $\hat{f}$ is a good predictor for all inputs that would be encountered in practice.
+
+
+
+## **Parametric vs Non-Parametric**
+
+Statistical learning methods fall into two broad categories:
+
+*Parametric* - we make strong assumptions about the functional form of $f$. These methods are inherently more restrictive but also more interpretable, meaning a human can easily describe how an observed feature input is transformed into a predicted label output.
+
+*Non-Parametric* - no explicit assumptions about the functional form of $f$ - these are flexible, but often not interpretable.
+
+Model flexibility comes at the cost of loss of interpretability.  When inference is the objective, interpretability is important; in a prediction context, we are less concerned about interpretability, and more about model accuracy.
+
+
+## **Function Approximation**
+
+Function approximation is an alternative lens through which to view prediction via statistical learning.
+
+In the function approximation paradigm, the observed $\{(x_i, y_i)\}$ training observations are viewed as points in $(p + 1)$-dimensional Euclidean space.  Then $f$ has domain equal to the input space, and has the following relationship to the data
+
+\begin{align*}
+y_i = f(x_i) + \epsilon_i.
+\end{align*}
+
+The goal is to find a useful approximation of $f$.  The function approximation paradigm encourages the invocation of euclidean geometry and probabilistic inference.
+
+Least squares and maximum likelihood are two tactics for function approximation that we will use.
+
+
+# Two Regression Algorithms
+
+## **Linear Regression**
+
+Consider inputs $X = (1, X_1, \ldots, X_p)$ and  numerical output $Y$.
+
+Linear regression approximates the relationship between $X$ and $Y$ as
+
+\begin{align*}
+\hat{Y} = X^{T}\hat{\beta}.
+\end{align*}
+
+Notice that $(X, \hat{Y})$ is a linear subspace of $\mathbb{R}^{p+2}$.
+
+Notice that $f(x) = X^T\beta \,$ is linear and that $f'(X) = \beta$ is the vector that points in the steepest uphill direction.
+
+## **How to Choose** $\hat{\beta}$
+
+So how do we choose $\hat{\beta}$?  
+
+For a generic $\beta$ we define the *residual sum of squares* as
+
+\begin{align*}
+\text{RSS}(\beta) = \sum_{i = 1}^{n} (y_i - x_i^{T}\beta)^2.
+\end{align*}
+
+The $\hat{\beta}$ that we seek is the one that minimizes RSS.
+
+Notice that this RSS function is a quadratic function in the true parameters, so there is always a minimum (though not necessarily unique).  Let's rewrite the RSS function in matrix notation:
+
+\begin{align*}
+\text{RSS}(\beta) = \big(\mathbf{y} - \mathbf{X}\beta \big)^T \big( \mathbf{y} - \mathbf{X}\beta \big).
+\end{align*}
+
+
+## **How to Choose** $\hat{\beta}$
+
+If we differentiate with respect to $\beta$ and set equal to zero we get the normal equations:
+
+\begin{align}
+\mathbf{X}\big(\mathbf{y} - \mathbf{X}\beta \big).
+\end{align}
+
+If $\mathbf{X}^T \mathbf{X}$ is non-singular, then the unique solution to the normal equations is:
+
+\begin{align*}
+\hat{\beta} = \big(\mathbf{X}^T \mathbf{X} \big)^{-1} \mathbf{X}^T \mathbf{y}.
+\end{align*}
+
+And thus, the prediction associated with $x_{0}$ is $\hat{y}_0 = x_{0}^T \hat{\beta}$.
+
+## **Nearest Neighbors Regression**
+
+Suppose we have a set of training data $\{(x_1, y_1), \ldots, (x_p, y_p)\}$.
+
+For a give feature observation $x$, the nearest neighbors predictor is:
+
+\begin{align*}
+\hat{Y}(x) = \frac{1}{K} \sum_{x_i \in N_k(x)} y_i
+\end{align*}
+
+where $N_k(x)$ is the set of $k$ training features that are closest to $x$ (usually nearness is determined by the standard euclidean metric).
+
+A large subset of popular machine learning algorithms are variants of linear regression or $k$-nearest-neighbors (KNN).
+
+
+
+# Classification
+
+## **Categorical Labels**
+
+Suppose we wish to estimate $f$ from training data $\{(x_1, y_1), \ldots, (x_n, y_n)\}$ where the $y_i$ are categorical.  This is called *classification*.
+
+If $\hat{f}$ is our estimate then the *training error rate* is:
+
+\begin{align*}
+\frac{1}{n} \sum_{i = 1}^{n} I(y_i = \hat{y}_i) 
+\end{align*}
+
+where $\hat{y}_i = \hat{f}(x_i)$ and $I(\cdot)$ is the indicator function.
+
+## **Bayes Classifier**
+
+*Test data* is observations that are not in the training set.
+
+For a set of *test* observations of the form $(x_0, y_0)$, the *test error* is defined as:
+
+\begin{align*}
+\text{Average}\big(I(y_0 = \hat{f}(x_0)) \big).
+\end{align*}
+
+It is possible to prove that the test error is minimized when
+
+\begin{align*}
+\hat{f}(x_0) = \underset{j}{\text{argmax}} \:\, Pr(Y = j | X = x_0).
+\end{align*}
+
+
+This is called the *Bayes classifier*, and this optimal error rate is called the *Bayes error rate*. 
+
+The *Bayes classifier* represents the best you can do in classification.
+
+
+## **Bayes Classifier**
+
+By definition of the Bayes classifier, for $X = x_0$ the error rate will be:
+
+\begin{align*}
+1 - \underset{j} \max Pr(Y = j | X = x_0).
+\end{align*}
+
+Then the overall error rate is given by:
+
+\begin{align*}
+1 - E\big(\underset{j} \max Pr(Y = j | X)\big).
+\end{align*}
+
+
+We can't use the Bayes classifier directly because we don't know the conditional probabilities of $Y$ given $X$.  
+
+The Bayes classifier is the unattainable gold-standard against which we compare other methods.
+
+## **Nearest Neighbors Classifier**
+
+Many classification methods seek to estimate $Y | X$  and classify according to maximum conditional probability.
+
+KNN is such a classifier where $Pr(Y = j|X = x_0)$ is modeled as:
+
+\begin{align*}
+\frac{1}{k} \sum_{x_i \in N_k(x_0)} I(y_i = j).
+
+\end{align*}
+
+# Statistical Decision Theory
+
+
+## **Regression**
+
+Let $X \in \mathbb{R}^p$ denote a real-valued feature vector, and let $Y$ be a real-valued label.  Suppose that the joint distribution function of our feature and label is $Pr(X, Y)$.
+
+
+We seek an $f(X)$ that predicts $Y$.  In order to develop this theory, we will require the notion of a *loss function* $L(Y, f(X))$ that penalizes prediction error.  The most common loss function is
+
+
+\begin{align*}
+L(Y, f(X)) = (Y - f(X))^2.
+\end{align*}
+
+
+## **Regression**
+
+Under the squared error loss function given above, the expected prediction error is:
+
+\begin{align*}
+\text{EPE} &= E\big(Y - f(X)\big)^2 \\
+           &= \int \big[y - f(x)\big]^2 Pr(X, Y).
+\end{align*}
+
+
+We can use conditional expectation on $X$ which give us:
+
+\begin{align*}
+\text{EPE}(f) &= E\big[(Y-f(X))^2\big] \\
+&= E_XE_{Y|X} \big[(Y - f(X))^2 | X\big] 
+
+\end{align*}
+
+
+## **Regression **
+It suffices to minimize EPE pointwise:
+
+\begin{align*}
+f(x) = \underset{c}{\text{argmin}} \: E_{Y|X} \big([Y- c]^2 | X = x\big).
+\end{align*}
+
+The solution to this pointwise minimization is
+
+
+\begin{align*}
+f(X) = E(Y | X = x)
+\end{align*}
+
+which is referred to as the *regression function*.  
+
+
+So, in this statistical decision theory the we have developed, the condition expectational is the optimal estimate.
+
+## **Using a Different Loss Function**
+
+The loss function we chose in the above arguments was the $L_2$ norm.  
+
+If we instead use the $L_1$ norm, we would get a slightly different optimal solution
+
+\begin{align*}
+\hat{f}(x) = \text{median}(Y | X = x).
+\end{align*}
+
+Of course, median is just a different measure of location, so this estimate is very much related.
+
+## **Nearest Neighbors Regression**
+
+The nearest neighbor algorithm is an attempt to apply this recipe directly.
+
+Specifically, at each point $x$ in the input space, we ask for the value of $\hat{f}(x)$ to be the average of all the $y_i$ with $x_i = x$.  There is typically at most one such value, so we settle for
+
+\begin{align*}
+\hat{f}(x) = \text{Average}(y_i | x_i \in N_k(x)).
+\end{align*}
+
+Two approximations to the conditional expectation recipe are happening: (1)  expectation is approximated by averaging; (2) conditioning on a point is approximated by condition on a region close to that point.
+
+
+## **Nearest Neighbors Regression**
+Under mild conditions we can show that if $n, k \rightarrow \infty$ such that $k/n \rightarrow 0$, we show that nearest neighbors regression converges to the optimal conditional expectation predictor:
+
+\begin{align*}
+\hat{f}(x) \rightarrow E(Y| X = x).
+\end{align*}
+
+Despite this fact, nearest neighbors is not the golden ticket.  
+
+Often, we don't have large data sets, and the convergence can be particularly slow if there are a large number of features (an issue referred to as *the curse of dimnesionality*).
+
+## **Linear Regression**
+
+Linear regression also fits into our decision theoretic, conditional expectations framework.  
+
+Recall that in linear regression we assume that $f(x) \approx x^{T}\beta$. Thus, our expected error loss is:
+
+\begin{align*}
+\text(EPE)(f) = E(Y - x^{T}\beta)^2.
+\end{align*}
+
+After differentiating (need to understand this better), we get that:
+
+\begin{align*}
+\beta = \big[E(XX^T)\big]^{-1}E(XY).
+\end{align*}
+
+We have not conditioned on $X$, rather we use our assumption of the linear functional relationship to pool over values of $X$.  
+
+Least squares amounts to replacing conditional expectations by averages over the training data.
+
+## **Least Squares vs Nearest Neighbors**
+
+Both $k$-nearest neighbors and linear regression approximate conditional expectation with averages.  But they have very different model assumptions.
+
+Least squares assumes that $f(X)$ is globally linear.  
+
+KNN assumes that $f(X)$ is locally constant.
+
+## **Classification**
+
+Classification problems can be placed in a similar decision theoretic framework.
+
+If we are trying to predict a categorical label $G$ from feature $X$, then we would arrive at the following optimal estimate
+
+<!-- \hat{G}(x) = \underset{g in {G}} \text{argmax} -->
+\begin{align*}
+\hat{G}(x) = \underset{g \in \mathcal{G}}{\text{argmax}} \,\, Pr(g | X = x).
+\end{align*}
+
+Said in words, the optimal prediction is the class $g$ that has the maximum conditional probability given $X = x$.
+
+Nearest neighbors classification seeks to estimate this conditional probability directly.
+
+# Bias and Variance
+
+## **Reducible and Irreducible Error**
+
+Consider a prediction problem in which we are trying to forecast a quantitative label $Y$ from features $X$.  Our assumption is that there is some kind of functional relationship
+
+\begin{align*}
+Y = f(X) + \epsilon.
+\end{align*}
+
+Let our prediction estimate be $\hat{f}$.  Then we have that the average squared prediction error of our estimate is
+
+\begin{align*}
+E(Y - \hat{Y})^2 &= E\big[f(X) + \epsilon - \hat{f}(X) \big]^2 \\
+  &= E\big[f(X) - \hat{f}(X)\big]^2 + \text{Var}(\epsilon)
+\end{align*}
+
+The expression $\text{Var}(\epsilon)$ is called the *irreducible error*, while the expression $E\big[f(X) - \hat{f}(X)\big]^2$ is referred to as the *reducible error*. 
+
+## **Mean-Squared Error**
+
+The mean squared error of an function estimate $\hat{f}$ is defined as:
+
+\begin{align*}
+\text{MSE} = \frac{1}{n} \sum_{i = 1}^{n} \big(y_i - \hat{f}(x_i)\big)^2.
+\end{align*}
+
+For a given $x_0$, with true value $y = f(x_0)$, the expected MSE for the estimate $\hat{f}(x_0)$ is:
+
+\begin{align*}
+E\big(y - \hat{f}(x_0)\big)^2 & = \big[E(\hat{f}(x_0))-y\big]^2                  & + E\big[\hat{f}(x_0) - E(\hat{f}(x_0))]^2 & + \text{Var}(\epsilon) \\
+                              & = \big[\text{Bias}\big(\hat{f}(x_0)\big)\big]^2  & + \text{Var}\big(\hat{f}(x_0)\big)        & + \text{Var}(\epsilon).
+\end{align*}
+
+This equation provides a formal demonstration how expected MSE of an estimate $\hat{f}$ decomposes into *variance* and *bias*.
+
+## **Variance-Bias Trade-Off**
+
+The *variance* of $\hat{f}$ is the amount it would changed if it was learned using different training data.
+
+The *bias* of $\hat{f}$ is the error that is introduced by modeling a complex phenomenon by something much simpler.
+
+Learning algorithms that are more flexible will have high variance and low bias.  Algorithms that are less flexible with have low variance and high bias.
+
+# Miscellaneous Notes
+
+## **Prediction vs Inference**
+
+When the data analysis objective is prediction, we think of $\hat{f}$ as a black-box.  We don't care about the internals, we only care that it produces accurate inputs.
+
+When inference is objective, the nature of the association between the features and the labels is the primary concern.  We are focused on things like:
+
+  - identify key predictors and separating out confounders
+
+  - which predictors are associated with the response
+  
+  - is the relationship linear
+
+
+## **Dummy Variables**
+
+Discrete variables are often coded as *dummy variables*.  
+
+A $k$-level dummy variable is a $k$-dimensional vector of bits, where only a single entry is $1$ and all the rest are $0$.
+
+
+## **Binary Classification**
+
+Consider a learning task in which we are trying predict a categorical label $G$ from values of a feature $X$. 
+
+If $G$ is binary, then one approach is to use a binary coded $Y$ such that the estimate $\hat{Y}$ takes on values in  the unit interval $[0, 1]$.  Then the actual prediction would be based on $\hat{Y} > 0.5$.  
+
+We can generalize this approach to $k$-leveled label $G$.
+
+## **Variance-Bias Trade-Off**
+
+The *variance-bias trade-off* is demonstrated by probabilistic arguments involving expected prediction error.
+
+
+
+# References
+
+##
+
+*Introducton to Statistical Learning* - Chapters 1-2
+
+*Elements of Statistical Learning* - Chapters 1-2
+
+
+
+

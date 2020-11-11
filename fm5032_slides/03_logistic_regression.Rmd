@@ -1,0 +1,105 @@
+---
+title: "03 - Logistic Regression"
+author: "Pritam Dalal"
+output: 
+  revealjs::revealjs_presentation:
+    theme: simple
+    highlight: haddock
+    center: true
+    transition: slide
+    css: reveal.css
+    self_contained: true
+---
+
+# Univariate Logistic Regression
+
+## **Classification via Probability**
+
+Suppose that we have a *binary* label $Y$ that we are trying to predict from a single numeric feature $X$.
+
+On approach to doing this is to model: 
+
+\begin{align*}
+p(X) = Pr(Y = 1 | X).
+\end{align*}
+
+This is the approach we take using logistic regression.
+
+## **Logistic Regression**
+
+In *logistic regression*, we assume that the conditional distribution of $Y$ given $X$, 
+
+\begin{align*}
+p(x) = Pr(Y = 1 | X),
+\end{align*}
+ 
+is given by the logistic function, which looks like
+
+\begin{align*}
+p(X) = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 + \beta_1 X}}.
+\end{align*}
+
+
+## **Odds and Log-Odds**
+
+From the logistic function we can easily calculate the odds and log-odds ratios as follows:
+
+\begin{align*}
+\frac{p(X)}{1 - p(X)} &= e^{\beta_0 + \beta_1 X}\\[8pt]
+
+\log\Bigg(\frac{p(x)}{1 - p(x)} \Bigg) &= \beta_0 + \beta_1 X
+\end{align*} 
+
+
+## **Interpreting Log-Odds**
+
+In a simple linear regression, $\beta_1$ gives the average change in $Y$ for a one unit increase in $X$.
+
+Analogously, in univariate logistic regression, a one unit increase in $X$ increases the log-odds of $Y$ by $\beta_1$.
+
+
+## **Maximum Likelihood**
+
+Let $\{(x_1, y_1), \ldots, (x_n, y_n)\}$ be the training data that we will use to fit our logistic regression.
+
+In simple linear regression, we used least squares, i.e. the minimization of RSS, as the criterion for choosing $\hat{\beta}_1$.
+
+In logistic regression, we will instead maximize the likelihood function which is defined as
+
+\begin{align*}
+\mathcal{l}(\beta_0, \beta_1) = \prod_{i: y_i = 1} p(x_i) \prod_{i: y_i = 1} (1 - p(x_i))
+\end{align*}
+
+Least squares is actually a special case of maximum likelihood (need to show this).
+
+## **Additional Remarks**
+
+The analogue of the $t$-statistic in linear regression is the $z$-statistic in logistic regression.
+
+Qualitative predictors can be added by using the dummy variable approach.
+
+
+# Multiple Logistic Regression
+
+## **The Basic Setup**
+
+Suppose that we are trying to predict the probability of a binary $Y$, using multiple features $X_1, \ldots, X_p$. 
+
+Multiple logistic regression is one approach to doing this, and assumes that $Pr(Y = 1| X)$ is given by the following logistic function:
+
+\begin{align*}
+p(X) = \frac{e^{\beta_0 + \beta_1 X_1 + \ldots + \beta_p X_p}}{1 + e^{\beta_0 + \beta_1 X_p + \ldots + \beta_p X_p}}.
+\end{align*}
+
+which leads to the following expression for the log-odds:
+
+\begin{align*}
+\log\Bigg(\frac{p(x)}{1 - p(x)} \Bigg) &= \beta_0 + \beta_1 X_1 + \ldots + \beta_p X_p.
+\end{align*}
+
+# References
+
+
+##
+
+*Introduction to Statistical Learning* - Sections 4.1-4.3

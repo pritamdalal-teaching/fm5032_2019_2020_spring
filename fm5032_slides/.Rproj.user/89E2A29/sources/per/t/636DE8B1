@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1586393214714.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2687452856",
+    "id" : "636DE8B1",
+    "lastKnownWriteTime" : 1586378135,
+    "last_content_update" : 1586378135,
+    "path" : "~/files/active_analytics/fm5032_2019_2020_spring/fm5032_slides/01_introductory_remarks.Rmd",
+    "project_path" : "01_introductory_remarks.Rmd",
+    "properties" : {
+        "cursorPosition" : "512,96",
+        "marks" : "<:526,26\n>:526,26",
+        "scrollLine" : "503"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
